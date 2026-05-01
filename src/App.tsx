@@ -33,7 +33,6 @@ class App extends Component<object, AppState> {
         `https://rickandmortyapi.com/api/character/?name=${searchValue}`
       );
       const data = await response.json();
-      console.log(data);
 
       this.setState({ characters: data.results || [] });
     } catch (error) {

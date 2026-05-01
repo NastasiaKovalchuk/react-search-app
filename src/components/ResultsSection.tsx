@@ -57,13 +57,13 @@ class ResultsSection extends Component<ResultsProps> {
               <div className='absolute w-64 h-64 bg-lime-500/10 blur-[100px] pointer-events-none'></div>
 
               <div className='z-10 text-center'>
-                <div className='text-6xl mb-4 animate-pulse'>🌀</div>
+                <div className='text-6xl mb-4 animate-spin-slow'>🛸</div>
                 <h3 className='text-lime-500 text-xl font-bold uppercase tracking-tighter'>
-                  Waiting for Input...
+                  Scanning Multiverse...
                 </h3>
                 <p className='text-slate-500 text-sm mt-2 max-w-xs'>
-                  Enter a name to fetch data from across the Multiverse.{' '}
-                  {"Don't be a Jerry."}
+                  If no results appear, try a different dimension or check your
+                  subspace connection.
                 </p>
               </div>
             </div>
