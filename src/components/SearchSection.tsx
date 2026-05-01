@@ -3,11 +3,12 @@ import { Component } from 'react';
 interface SearchSectionProps {
   value: string;
   onSearchChange: (value: string) => void;
+  onSearchClick: () => void;
 }
 
 class SearchSection extends Component<SearchSectionProps> {
   render() {
-    const { value, onSearchChange } = this.props;
+    const { value, onSearchChange, onSearchClick } = this.props;
     return (
       <div className='flex flex-col md:flex-row items-center justify-between gap-6'>
         <div className='flex flex-col items-center md:items-start'>
@@ -25,9 +26,15 @@ class SearchSection extends Component<SearchSectionProps> {
             placeholder='Search character...'
             value={value}
             onChange={(e): void => onSearchChange(e.target.value)}
+            onKeyDown={(e): void => {
+              if (e.key === 'Enter') onSearchClick();
+            }}
             className='w-full px-4 py-3 bg-slate-800 border-2 border-lime-500 rounded-l-xl focus:bg-slate-700 outline-none text-lime-400 placeholder:text-lime-900 font-bold'
           />
-          <button className='bg-lime-500 hover:bg-lime-400 text-slate-900 font-black px-6 py-3 rounded-r-xl transition-all hover:shadow-[0_0_15px_#bef264] uppercase text-sm border-2 border-lime-500'>
+          <button
+            className='bg-lime-500 hover:bg-lime-400 text-slate-900 font-black px-6 py-3 rounded-r-xl transition-all hover:shadow-[0_0_15px_#bef264] uppercase text-sm border-2 border-lime-500'
+            onClick={onSearchClick}
+          >
             Go!
           </button>
         </div>

@@ -2,19 +2,53 @@ import { Component } from 'react';
 import SearchSection from './components/SearchSection';
 import ResultsSection from './components/ResultsSection';
 
+export interface Character {
+  id: number;
+  name: string;
+  species: string;
+  status: string;
+  image: string;
+}
+
 interface AppState {
   searchValue: string;
+  characters: Character[];
 }
 
 class App extends Component<object, AppState> {
   state = {
     searchValue: localStorage.getItem('search_value') || '',
+    characters: [],
   };
 
   handleSearchChange = (value: string): void => {
     this.setState({ searchValue: value });
     localStorage.setItem('search_value', value);
   };
+
+  searchCharacters = async (): Promise<void> => {
+    const { searchValue } = this.state;
+    try {
+      const response = await fetch(
+        `https://rickandmortyapi.com/api/character/?name=${searchValue}`
+      );
+      const data = await response.json();
+      console.log(data);
+
+      this.setState({ characters: data.results || [] });
+    } catch (error) {
+      console.error('Fetch error:', error);
+      this.setState({ characters: [] });
+    }
+  };
+
+  handleSearchClick = (): void => {
+    this.searchCharacters();
+  };
+
+  componentDidMount(): void {
+    this.searchCharacters();
+  }
 
   render() {
     return (
@@ -24,12 +58,13 @@ class App extends Component<object, AppState> {
             <SearchSection
               value={this.state.searchValue}
               onSearchChange={this.handleSearchChange}
+              onSearchClick={this.handleSearchClick}
             />
           </div>
         </header>
 
         <main className='max-w-5xl mx-auto px-6 py-8'>
-          <ResultsSection />
+          <ResultsSection characters={this.state.characters} />
         </main>
       </div>
     );
