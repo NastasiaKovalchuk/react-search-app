@@ -35,7 +35,7 @@ class SearchSection extends Component<SearchSectionProps> {
             className='bg-lime-500 hover:bg-lime-400 text-slate-900 font-black px-6 py-3 rounded-r-xl transition-all hover:shadow-[0_0_15px_#bef264] uppercase text-sm border-2 border-lime-500'
             onClick={onSearchClick}
           >
-            Go!
+            Search!
           </button>
         </div>
       </div>

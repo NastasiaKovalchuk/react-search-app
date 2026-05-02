@@ -12,12 +12,14 @@ export interface Character {
 
 interface AppState {
   searchValue: string;
+  lastExecutedTerm: string;
   characters: Character[];
 }
 
 class App extends Component<object, AppState> {
   state = {
     searchValue: localStorage.getItem('search_value') || '',
+    lastExecutedTerm: '',
     characters: [],
   };
 
@@ -27,17 +29,27 @@ class App extends Component<object, AppState> {
   };
 
   searchCharacters = async (): Promise<void> => {
-    const { searchValue } = this.state;
+    const { searchValue, lastExecutedTerm } = this.state;
+    const trimmedTerm = searchValue.trim();
+
+    if (trimmedTerm === lastExecutedTerm && lastExecutedTerm !== '') {
+      return;
+    }
+
     try {
+      console.log('запрос ушел');
       const response = await fetch(
-        `https://rickandmortyapi.com/api/character/?name=${searchValue}`
+        `https://rickandmortyapi.com/api/character/?name=${trimmedTerm}&page=1`
       );
       const data = await response.json();
 
-      this.setState({ characters: data.results || [] });
+      this.setState({
+        characters: data.results || [],
+        lastExecutedTerm: trimmedTerm,
+      });
     } catch (error) {
       console.error('Fetch error:', error);
-      this.setState({ characters: [] });
+      this.setState({ characters: [], lastExecutedTerm: trimmedTerm });
     }
   };
 
