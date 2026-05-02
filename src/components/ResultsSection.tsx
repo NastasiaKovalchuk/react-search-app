@@ -13,7 +13,7 @@ class ResultsSection extends Component<ResultsProps> {
 
     return (
       <section className='bg-slate-900 border-4 border-slate-800 rounded-3xl overflow-hidden shadow-2xl transition-all'>
-        <div className='px-6 py-3 bg-slate-800 flex gap-2 border-b-2 border-slate-700/50'>
+        <div className='px-6 py-3 bg-slate-800 flex items-center gap-2 border-b-2 border-slate-700/50'>
           <div className='w-3 h-3 rounded-full bg-red-500'></div>
           <div className='w-3 h-3 rounded-full bg-yellow-500'></div>
           <div className='w-3 h-3 rounded-full bg-green-500'></div>
@@ -27,9 +27,9 @@ class ResultsSection extends Component<ResultsProps> {
           </span>
         </div>
 
-        <div className='p-6 min-h-[400px]'>
+        <div className='p-6 min-h-[400px] flex flex-col'>
           {errorMessage ? (
-            <div className='z-10 text-center animate-in fade-in zoom-in duration-300'>
+            <div className='my-auto text-center animate-in fade-in zoom-in duration-300'>
               <div className='text-6xl mb-4'>⚡</div>
               <h3 className='text-red-500 text-xl font-bold uppercase tracking-tighter'>
                 Dimension Error Detected
@@ -39,7 +39,7 @@ class ResultsSection extends Component<ResultsProps> {
               </p>
             </div>
           ) : isLoading ? (
-            <div className='flex-1 flex flex-col items-center justify-center space-y-4'>
+            <div className='my-auto flex flex-col items-center justify-center space-y-4'>
               <div className='w-12 h-12 border-4 border-lime-500/20 border-t-lime-500 rounded-full animate-spin'></div>
               <p className='text-lime-500 animate-pulse font-bold uppercase text-xs tracking-[0.2em]'>
                 Accessing Central Finite Curve...
@@ -57,7 +57,6 @@ class ResultsSection extends Component<ResultsProps> {
                     alt={char.name}
                     className='w-full h-48 object-cover border-b-2 border-lime-500/20'
                   />
-
                   <div className='p-4'>
                     <h2 className='text-lg font-black text-lime-400 group-hover:text-lime-300 transition-colors uppercase tracking-tight'>
                       {char.name}
@@ -77,18 +76,35 @@ class ResultsSection extends Component<ResultsProps> {
               ))}
             </div>
           ) : (
-            <div className='flex flex-col items-center justify-center py-20 relative'>
+            <div className='my-auto flex flex-col items-center justify-center py-10 relative'>
               <div className='absolute w-64 h-64 bg-lime-500/10 blur-[100px] pointer-events-none'></div>
 
-              <div className='z-10 text-center'>
-                <div className='text-6xl mb-4 animate-spin-slow'>🛸</div>
-                <h3 className='text-lime-500 text-xl font-bold uppercase tracking-tighter'>
-                  Scanning Multiverse...
+              <div className='z-10 text-center animate-in fade-in slide-in-from-bottom-4 duration-500'>
+                <div className='text-6xl mb-4 animate-bounce'>🛸</div>
+                <h3 className='text-lime-500 text-xl font-black uppercase tracking-tighter'>
+                  No Life Forms Found
                 </h3>
-                <p className='text-slate-500 text-sm mt-2 max-w-xs'>
-                  If no results appear, try a different dimension or check your
-                  subspace connection.
+                <p className='text-slate-400 text-sm mt-4 max-w-xs mx-auto leading-relaxed'>
+                  {
+                    "The sensors couldn't find anyone with that name in this dimension."
+                  }
+                  <br />
+                  <span className='text-lime-400/80 font-bold italic'>
+                    Try searching for a different name or check your spelling!
+                  </span>
                 </p>
+
+                <div className='mt-6 flex gap-2 justify-center opacity-50'>
+                  <span className='text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700'>
+                    Rick
+                  </span>
+                  <span className='text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700'>
+                    Morty
+                  </span>
+                  <span className='text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded border border-slate-700'>
+                    Beth
+                  </span>
+                </div>
               </div>
             </div>
           )}

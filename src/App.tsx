@@ -1,6 +1,8 @@
 import { Component } from 'react';
 import SearchSection from './components/SearchSection';
 import ResultsSection from './components/ResultsSection';
+import BuggyButton from './components/BuggyButton';
+import ErrorBoundary from './components/ErrorBoundary';
 
 export interface Character {
   id: number;
@@ -19,7 +21,7 @@ interface AppState {
 }
 
 class App extends Component<object, AppState> {
-  state = {
+  state: AppState = {
     searchValue: localStorage.getItem('search_value') || '',
     lastExecutedTerm: '',
     characters: [],
@@ -47,6 +49,15 @@ class App extends Component<object, AppState> {
         `https://rickandmortyapi.com/api/character/?name=${trimmedTerm}&page=1`
       );
 
+      if (response.status === 404) {
+        this.setState({
+          characters: [],
+          lastExecutedTerm: trimmedTerm,
+          isLoading: false,
+        });
+        return;
+      }
+
       if (!response.ok) {
         throw new Error('Something went wrong with the server');
       }
@@ -56,7 +67,6 @@ class App extends Component<object, AppState> {
       this.setState({
         characters: data.results || [],
         lastExecutedTerm: trimmedTerm,
-        isLoading: false,
       });
     } catch {
       this.setState({
@@ -92,11 +102,16 @@ class App extends Component<object, AppState> {
         </header>
 
         <main className='max-w-5xl mx-auto px-6 py-8'>
-          <ResultsSection
-            characters={this.state.characters}
-            isLoading={this.state.isLoading}
-            errorMessage={this.state.errorMessage}
-          />
+          <ErrorBoundary>
+            <ResultsSection
+              characters={this.state.characters}
+              isLoading={this.state.isLoading}
+              errorMessage={this.state.errorMessage}
+            />
+          </ErrorBoundary>
+          <footer className='max-w-5xl mx-auto px-6 py-10 flex justify-center border-t border-slate-800/50 mt-10'>
+            <BuggyButton />
+          </footer>
         </main>
       </div>
     );
