@@ -15,6 +15,7 @@ interface AppState {
   lastExecutedTerm: string;
   characters: Character[];
   isLoading: boolean;
+  errorMessage: string | null;
 }
 
 class App extends Component<object, AppState> {
@@ -23,6 +24,7 @@ class App extends Component<object, AppState> {
     lastExecutedTerm: '',
     characters: [],
     isLoading: false,
+    errorMessage: null,
   };
 
   handleSearchChange = (value: string): void => {
@@ -37,13 +39,18 @@ class App extends Component<object, AppState> {
       return;
     }
 
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, errorMessage: null });
     localStorage.setItem('search_value', trimmedTerm);
 
     try {
       const response = await fetch(
         `https://rickandmortyapi.com/api/character/?name=${trimmedTerm}&page=1`
       );
+
+      if (!response.ok) {
+        throw new Error('Something went wrong with the server');
+      }
+
       const data = await response.json();
 
       this.setState({
@@ -51,11 +58,12 @@ class App extends Component<object, AppState> {
         lastExecutedTerm: trimmedTerm,
         isLoading: false,
       });
-    } catch (error) {
-      console.error('Fetch error:', error);
+    } catch {
       this.setState({
         characters: [],
         lastExecutedTerm: trimmedTerm,
+        errorMessage:
+          'Ouch! The interdimensional portal is unstable. (API Error)',
       });
     } finally {
       this.setState({ isLoading: false });
@@ -87,6 +95,7 @@ class App extends Component<object, AppState> {
           <ResultsSection
             characters={this.state.characters}
             isLoading={this.state.isLoading}
+            errorMessage={this.state.errorMessage}
           />
         </main>
       </div>

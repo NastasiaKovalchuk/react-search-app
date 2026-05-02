@@ -4,11 +4,12 @@ import type { Character } from '../App';
 interface ResultsProps {
   characters: Character[];
   isLoading: boolean;
+  errorMessage: string | null;
 }
 
 class ResultsSection extends Component<ResultsProps> {
   render() {
-    const { characters, isLoading } = this.props;
+    const { characters, isLoading, errorMessage } = this.props;
 
     return (
       <section className='bg-slate-900 border-4 border-slate-800 rounded-3xl overflow-hidden shadow-2xl transition-all'>
@@ -20,12 +21,24 @@ class ResultsSection extends Component<ResultsProps> {
             Terminal —{' '}
             {isLoading
               ? 'Status: Syncing...'
-              : `Results: ${characters.length} units found`}
+              : errorMessage
+                ? 'Status: Critical Error'
+                : `Results: ${characters.length} units found`}
           </span>
         </div>
 
         <div className='p-6 min-h-[400px]'>
-          {isLoading ? (
+          {errorMessage ? (
+            <div className='z-10 text-center animate-in fade-in zoom-in duration-300'>
+              <div className='text-6xl mb-4'>⚡</div>
+              <h3 className='text-red-500 text-xl font-bold uppercase tracking-tighter'>
+                Dimension Error Detected
+              </h3>
+              <p className='text-slate-400 text-sm mt-2 max-w-xs mx-auto'>
+                {errorMessage}
+              </p>
+            </div>
+          ) : isLoading ? (
             <div className='flex-1 flex flex-col items-center justify-center space-y-4'>
               <div className='w-12 h-12 border-4 border-lime-500/20 border-t-lime-500 rounded-full animate-spin'></div>
               <p className='text-lime-500 animate-pulse font-bold uppercase text-xs tracking-[0.2em]'>
