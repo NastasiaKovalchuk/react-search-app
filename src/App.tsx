@@ -14,6 +14,7 @@ interface AppState {
   searchValue: string;
   lastExecutedTerm: string;
   characters: Character[];
+  isLoading: boolean;
 }
 
 class App extends Component<object, AppState> {
@@ -21,6 +22,7 @@ class App extends Component<object, AppState> {
     searchValue: localStorage.getItem('search_value') || '',
     lastExecutedTerm: '',
     characters: [],
+    isLoading: false,
   };
 
   handleSearchChange = (value: string): void => {
@@ -35,6 +37,7 @@ class App extends Component<object, AppState> {
       return;
     }
 
+    this.setState({ isLoading: true });
     localStorage.setItem('search_value', trimmedTerm);
 
     try {
@@ -46,10 +49,16 @@ class App extends Component<object, AppState> {
       this.setState({
         characters: data.results || [],
         lastExecutedTerm: trimmedTerm,
+        isLoading: false,
       });
     } catch (error) {
       console.error('Fetch error:', error);
-      this.setState({ characters: [], lastExecutedTerm: trimmedTerm });
+      this.setState({
+        characters: [],
+        lastExecutedTerm: trimmedTerm,
+      });
+    } finally {
+      this.setState({ isLoading: false });
     }
   };
 
@@ -75,7 +84,10 @@ class App extends Component<object, AppState> {
         </header>
 
         <main className='max-w-5xl mx-auto px-6 py-8'>
-          <ResultsSection characters={this.state.characters} />
+          <ResultsSection
+            characters={this.state.characters}
+            isLoading={this.state.isLoading}
+          />
         </main>
       </div>
     );

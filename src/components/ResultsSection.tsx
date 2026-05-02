@@ -3,11 +3,12 @@ import type { Character } from '../App';
 
 interface ResultsProps {
   characters: Character[];
+  isLoading: boolean;
 }
 
 class ResultsSection extends Component<ResultsProps> {
   render() {
-    const { characters } = this.props;
+    const { characters, isLoading } = this.props;
 
     return (
       <section className='bg-slate-900 border-4 border-slate-800 rounded-3xl overflow-hidden shadow-2xl transition-all'>
@@ -16,12 +17,22 @@ class ResultsSection extends Component<ResultsProps> {
           <div className='w-3 h-3 rounded-full bg-yellow-500'></div>
           <div className='w-3 h-3 rounded-full bg-green-500'></div>
           <span className='ml-4 text-[10px] text-slate-500 uppercase tracking-widest font-bold'>
-            Terminal — Results: {characters.length} units found
+            Terminal —{' '}
+            {isLoading
+              ? 'Status: Syncing...'
+              : `Results: ${characters.length} units found`}
           </span>
         </div>
 
         <div className='p-6 min-h-[400px]'>
-          {characters.length > 0 ? (
+          {isLoading ? (
+            <div className='flex-1 flex flex-col items-center justify-center space-y-4'>
+              <div className='w-12 h-12 border-4 border-lime-500/20 border-t-lime-500 rounded-full animate-spin'></div>
+              <p className='text-lime-500 animate-pulse font-bold uppercase text-xs tracking-[0.2em]'>
+                Accessing Central Finite Curve...
+              </p>
+            </div>
+          ) : characters.length > 0 ? (
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
               {characters.map((char) => (
                 <div
