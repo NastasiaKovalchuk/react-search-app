@@ -25,7 +25,6 @@ class App extends Component<object, AppState> {
 
   handleSearchChange = (value: string): void => {
     this.setState({ searchValue: value });
-    localStorage.setItem('search_value', value);
   };
 
   searchCharacters = async (): Promise<void> => {
@@ -36,8 +35,9 @@ class App extends Component<object, AppState> {
       return;
     }
 
+    localStorage.setItem('search_value', trimmedTerm);
+
     try {
-      console.log('запрос ушел');
       const response = await fetch(
         `https://rickandmortyapi.com/api/character/?name=${trimmedTerm}&page=1`
       );
