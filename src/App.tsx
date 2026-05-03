@@ -1,8 +1,8 @@
 import { Component } from 'react';
-import SearchSection from './components/SearchSection';
-import ResultsSection from './components/ResultsSection';
-import BuggyButton from './components/BuggyButton';
-import ErrorBoundary from './components/ErrorBoundary';
+import SearchSection from './components/Search/SearchSection';
+import ResultsSection from './components/Results/ResultsSection';
+import BuggyButton from './components/UI/BuggyButton';
+import ErrorBoundary from './components/UI/ErrorBoundary';
 
 export interface Character {
   id: number;
@@ -103,15 +103,14 @@ class App extends Component<object, AppState> {
 
         <main className='max-w-5xl mx-auto px-6 py-8'>
           <ErrorBoundary>
+            <BuggyButton />
+
             <ResultsSection
               characters={this.state.characters}
               isLoading={this.state.isLoading}
               errorMessage={this.state.errorMessage}
             />
           </ErrorBoundary>
-          <footer className='max-w-5xl mx-auto px-6 py-10 flex justify-center border-t border-slate-800/50 mt-10'>
-            <BuggyButton />
-          </footer>
         </main>
       </div>
     );
