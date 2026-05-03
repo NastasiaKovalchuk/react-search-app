@@ -1,73 +1,42 @@
-# React + TypeScript + Vite
+# Rick and Morty Character Finder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React application built for the RS School course that allows users to explore characters from the "Rick and Morty" universe using the official API. The project focuses on React class components, TypeScript, and robust error handling.
 
-Currently, two official plugins are available:
+## 🚀 Deployment
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Live Demo:** [Link to your Netlify/Vercel/GitHub Pages deployment]
 
-## React Compiler
+## 🛠 Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 19** (Class-based components)
+- **TypeScript** (Strict type checking)
+- **Vite** (Build tool)
+- **Tailwind CSS** (Styling)
+- **Rick and Morty API** (Data source)
 
-## Expanding the ESLint configuration
+## ✨ Key Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Character Search**: Fetch and display character data based on user input.
+- **Persistent State**: Search queries are saved to `localStorage` and restored upon page reload.
+- **Loading States**: Visual feedback during API requests.
+- **Graceful Error Handling**:
+  - Handles API 404s and network failures.
+  - Implements a **Global Error Boundary** to prevent application crashes.
+- **Crash Test**: A dedicated "Execute Test Crash" button to verify Error Boundary functionality (Feature 9).
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 💻 Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **Clone the repository and switch to the task branch:**
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+   ```bash
+   git clone git@github.com:NastasiaKovalchuk/react-search-app.git
+   cd react-search-app
+   git checkout class-component
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+   ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
+2. Install dependencies:
+   npm install
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+3. Run development server:
+   npm run dev
