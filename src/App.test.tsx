@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import App from './App';
@@ -91,7 +91,6 @@ describe('App User Interaction', (): void => {
 
     expect(localStorage.getItem('search_value')).toBe(testValue);
     expect(spySetItem).toHaveBeenCalledWith('search_value', testValue);
-    spySetItem.mockRestore();
   });
 
   test('trims whitespace from search input before saving', async () => {
@@ -111,7 +110,6 @@ describe('App User Interaction', (): void => {
 
     expect(localStorage.getItem('search_value')).toBe(trimmedValue);
     expect(spySetItem).toHaveBeenCalledWith('search_value', trimmedValue);
-    spySetItem.mockRestore();
   });
 
   test('triggers search callback with correct parameters', async () => {
@@ -129,5 +127,84 @@ describe('App User Interaction', (): void => {
     expect(fetchSpy).toHaveBeenCalledWith(
       `https://rickandmortyapi.com/api/character/?name=${testValue}&page=1`
     );
+  });
+});
+
+describe('App Local Storage Integration', (): void => {
+  let fetchSpy: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    localStorage.clear();
+    fetchSpy = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async (): Promise<ApiResponse> => ({ results: [] }),
+    } as Response);
+
+    vi.stubGlobal('fetch', fetchSpy);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  test('retrieves saved search term on component mount', async (): Promise<void> => {
+    const savedTerm = 'Rick';
+    localStorage.setItem('search_value', savedTerm);
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalledWith(
+        `https://rickandmortyapi.com/api/character/?name=${savedTerm}&page=1`
+      );
+    });
+  });
+
+  test('does not execute duplicate search requests', async (): Promise<void> => {
+    const user = userEvent.setup();
+
+    render(<App />);
+
+    const input = screen.getByPlaceholderText(/Search character/i);
+    const button = screen.getByRole('button', { name: /search!/i });
+
+    await user.type(input, 'Rick');
+    await user.click(button);
+
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+    await user.click(button);
+
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+  });
+
+  test('handles 404 status by clearing characters list', async (): Promise<void> => {
+    const user = userEvent.setup();
+
+    fetchSpy.mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+      json: async (): Promise<{ error: string }> => ({ error: 'Not Found' }),
+    } as Response);
+
+    render(<App />);
+
+    const searchInput = screen.getByPlaceholderText(/Search character.../i);
+    const button = screen.getByRole('button', { name: /search!/i });
+
+    await user.type(searchInput, 'UnknownPerson');
+    await user.click(button);
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalledWith(
+        expect.stringContaining('name=UnknownPerson')
+      );
+    });
+
+    const apiError = screen.queryByText(
+      /Ouch! The interdimensional portal is unstable/i
+    );
+    expect(apiError).not.toBeInTheDocument();
   });
 });
