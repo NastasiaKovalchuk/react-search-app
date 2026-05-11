@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import type { Character } from '../App';
+import type { Character } from '../../App';
 import { CharacterCard } from './CharacterCard';
 import { Loader, ErrorState, EmptyState } from './ResultsStates';
 
