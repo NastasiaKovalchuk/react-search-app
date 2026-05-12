@@ -6,7 +6,7 @@ import ErrorBoundary from './ErrorBoundary';
 import BuggyButton from './BuggyButton';
 
 describe('BuggyButton', (): void => {
-  beforeEach(() => {
+  beforeEach((): void => {
     vi.spyOn(console, 'error').mockImplementation((): void => {});
   });
 
