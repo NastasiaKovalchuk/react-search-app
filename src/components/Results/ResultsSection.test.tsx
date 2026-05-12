@@ -1,70 +1,36 @@
 import { render, screen } from '@testing-library/react';
-import { vi } from 'vitest';
-import userEvent from '@testing-library/user-event';
 import ResultsSection from './ResultsSection';
+import { mockCharacters } from '../../test-utils/characters.mock.ts';
 
-describe('ResultsSection', (): void => {
+describe('Results Section Component', (): void => {
   const defaultProps = {
-    characters: [],
     isLoading: false,
-    errorMessage: '',
+    errorMessage: null,
   };
 
-  beforeEach((): void => {
-    vi.clearAllMocks();
+  test('renders correct number of items when data is provided', (): void => {
+    render(<ResultsSection {...defaultProps} characters={mockCharacters} />);
+
+    expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
+    expect(screen.getByText('Morty Smith')).toBeInTheDocument();
+    expect(screen.getByText(/Results: 2 units found/i)).toBeInTheDocument();
   });
 
-  test('renders input with correct value', (): void => {
-    render(<SearchSection {...defaultProps} value='Rick' />);
-    const input = screen.getByPlaceholderText(/Search character/i);
+  test('displays "no results" message when data array is empty', (): void => {
+    render(<ResultsSection {...defaultProps} characters={[]} />);
 
-    expect(input).toBeInTheDocument();
-    expect(input).toHaveValue('Rick');
+    expect(screen.getByText(/No Life Forms Found/i)).toBeInTheDocument();
+    expect(screen.getByText(/Results: 0 units found/i)).toBeInTheDocument();
   });
 
-  test('renders search button', (): void => {
-    render(<SearchSection {...defaultProps} />);
-    const button = screen.getByRole('button', { name: /search!/i });
-    expect(button).toBeInTheDocument();
-  });
+  test('shows loading state while fetching data', (): void => {
+    render(
+      <ResultsSection characters={[]} isLoading={true} errorMessage={null} />
+    );
 
-  test('calls onSearchChange when typing', async (): Promise<void> => {
-    const user = userEvent.setup();
-    render(<SearchSection {...defaultProps} />);
-
-    const input = screen.getByPlaceholderText(/Search character/i);
-    await user.type(input, 'Morty');
-
-    expect(mockOnSearchChange).toHaveBeenCalled();
-  });
-
-  test('calls onSearchClick when button is clicked', async (): Promise<void> => {
-    const user = userEvent.setup();
-    render(<SearchSection {...defaultProps} />);
-
-    const button = screen.getByRole('button', { name: /search!/i });
-    await user.click(button);
-
-    expect(mockOnSearchClick).toHaveBeenCalledTimes(1);
-  });
-
-  test('calls onSearchClick when Enter is pressed', async (): Promise<void> => {
-    const user = userEvent.setup();
-    render(<SearchSection {...defaultProps} />);
-
-    const input = screen.getByPlaceholderText(/Search character/i);
-    await user.type(input, '{enter}');
-
-    expect(mockOnSearchClick).toHaveBeenCalledTimes(1);
-  });
-
-  test('does not call onSearchClick when a random key is pressed', async (): Promise<void> => {
-    const user = userEvent.setup();
-    render(<SearchSection {...defaultProps} />);
-
-    const input = screen.getByPlaceholderText(/Search character/i);
-    await user.type(input, 'z');
-
-    expect(mockOnSearchClick).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(/Accessing Central Finite Curve/i)
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Status: Syncing.../i)).toBeInTheDocument();
   });
 });

@@ -11,7 +11,7 @@ const CrashComponent = (): never => {
 
 describe('ErrorBoundary', (): void => {
   beforeEach((): void => {
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation((): void => {});
   });
 
   afterEach((): void => {
@@ -49,7 +49,9 @@ describe('ErrorBoundary', (): void => {
   });
 
   test('logs error to console with correct information', async (): Promise<void> => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation((): void => {});
 
     render(
       <ErrorBoundary>
@@ -61,26 +63,26 @@ describe('ErrorBoundary', (): void => {
 
     consoleSpy.mockRestore();
   });
-});
 
-test('reload button triggers page reload', async (): Promise<void> => {
-  const user = userEvent.setup();
+  test('reload button triggers page reload', async (): Promise<void> => {
+    const user = userEvent.setup();
 
-  const reloadMock = vi.fn();
-  vi.stubGlobal('location', {
-    ...window.location,
-    reload: reloadMock,
+    const reloadMock = vi.fn();
+    vi.stubGlobal('location', {
+      ...window.location,
+      reload: reloadMock,
+    });
+
+    render(
+      <ErrorBoundary>
+        <BuggyButton />
+      </ErrorBoundary>
+    );
+
+    await user.click(screen.getByRole('button', { name: /Trigger Crash/i }));
+
+    await user.click(screen.getByRole('button', { name: /Reload Reality/i }));
+
+    expect(reloadMock).toHaveBeenCalled();
   });
-
-  render(
-    <ErrorBoundary>
-      <BuggyButton />
-    </ErrorBoundary>
-  );
-
-  await user.click(screen.getByRole('button', { name: /Trigger Crash/i }));
-
-  await user.click(screen.getByRole('button', { name: /Reload Reality/i }));
-
-  expect(reloadMock).toHaveBeenCalled();
 });

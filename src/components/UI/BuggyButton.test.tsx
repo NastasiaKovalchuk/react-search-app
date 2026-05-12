@@ -7,10 +7,10 @@ import BuggyButton from './BuggyButton';
 
 describe('BuggyButton', (): void => {
   beforeEach(() => {
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation((): void => {});
   });
 
-  afterEach(() => {
+  afterEach((): void => {
     vi.restoreAllMocks();
   });
 
