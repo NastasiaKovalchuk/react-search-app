@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import SearchSection from './components/Search/SearchSection';
 import ResultsSection from './components/Results/ResultsSection';
 import BuggyButton from './components/UI/BuggyButton';
@@ -12,36 +12,36 @@ export interface Character {
   image: string;
 }
 
-interface AppState {
-  searchValue: string;
-  lastExecutedTerm: string;
-  characters: Character[];
-  isLoading: boolean;
-  errorMessage: string | null;
-}
+// interface AppState {
+//   searchValue: string;
+//   lastExecutedTerm: string;
+//   characters: Character[];
+//   isLoading: boolean;
+//   errorMessage: string | null;
+// }
 
-class App extends Component<object, AppState> {
-  state: AppState = {
-    searchValue: localStorage.getItem('search_value') || '',
-    lastExecutedTerm: '',
-    characters: [],
-    isLoading: false,
-    errorMessage: null,
+const App = () => {
+  const [searchValue, setSearchValue] = useState<string>(
+    () => localStorage.getItem('search_value') || ''
+  );
+  const [lastExecutedTerm, setLastExecutedTerm] = useState<string>('');
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleSearchChange = (value: string): void => {
+    setSearchValue(value);
   };
 
-  handleSearchChange = (value: string): void => {
-    this.setState({ searchValue: value });
-  };
-
-  searchCharacters = async (): Promise<void> => {
-    const { searchValue, lastExecutedTerm } = this.state;
+  const searchCharacters = async (): Promise<void> => {
     const trimmedTerm = searchValue.trim();
 
     if (trimmedTerm === lastExecutedTerm && lastExecutedTerm !== '') {
       return;
     }
 
-    this.setState({ isLoading: true, errorMessage: null });
+    setIsLoading(true);
+    setErrorMessage(null);
     localStorage.setItem('search_value', trimmedTerm);
 
     try {
@@ -50,11 +50,9 @@ class App extends Component<object, AppState> {
       );
 
       if (response.status === 404) {
-        this.setState({
-          characters: [],
-          lastExecutedTerm: trimmedTerm,
-          isLoading: false,
-        });
+        setCharacters([]);
+        setLastExecutedTerm(trimmedTerm);
+
         return;
       }
 
@@ -64,57 +62,54 @@ class App extends Component<object, AppState> {
 
       const data = await response.json();
 
-      this.setState({
-        characters: data.results || [],
-        lastExecutedTerm: trimmedTerm,
-      });
+      setCharacters(data.results || []);
+      setLastExecutedTerm(trimmedTerm);
     } catch {
-      this.setState({
-        characters: [],
-        lastExecutedTerm: trimmedTerm,
-        errorMessage:
-          'Ouch! The interdimensional portal is unstable. (API Error)',
-      });
+      setCharacters([]);
+      setLastExecutedTerm(trimmedTerm);
+      setErrorMessage(
+        'Ouch! The interdimensional portal is unstable. (API Error)'
+      );
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
   };
 
-  handleSearchClick = (): void => {
-    this.searchCharacters();
+  const handleSearchClick = (): void => {
+    searchCharacters();
   };
 
-  componentDidMount(): void {
-    this.searchCharacters();
-  }
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    searchCharacters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  render() {
-    return (
-      <div className='min-h-screen bg-slate-950 text-slate-200 font-mono'>
-        <header className='border-b-4 border-lime-500 bg-slate-900 shadow-[0_0_20px_rgba(132,204,22,0.3)]'>
-          <div className='max-w-5xl mx-auto px-6 py-6'>
-            <SearchSection
-              value={this.state.searchValue}
-              onSearchChange={this.handleSearchChange}
-              onSearchClick={this.handleSearchClick}
-            />
-          </div>
-        </header>
+  return (
+    <div className='min-h-screen bg-slate-950 text-slate-200 font-mono'>
+      <header className='border-b-4 border-lime-500 bg-slate-900 shadow-[0_0_20px_rgba(132,204,22,0.3)]'>
+        <div className='max-w-5xl mx-auto px-6 py-6'>
+          <SearchSection
+            value={searchValue}
+            onSearchChange={handleSearchChange}
+            onSearchClick={handleSearchClick}
+          />
+        </div>
+      </header>
 
-        <main className='max-w-5xl mx-auto px-6 py-8'>
-          <ErrorBoundary>
-            <BuggyButton />
+      <main className='max-w-5xl mx-auto px-6 py-8'>
+        <ErrorBoundary>
+          <BuggyButton />
 
-            <ResultsSection
-              characters={this.state.characters}
-              isLoading={this.state.isLoading}
-              errorMessage={this.state.errorMessage}
-            />
-          </ErrorBoundary>
-        </main>
-      </div>
-    );
-  }
-}
+          <ResultsSection
+            characters={characters}
+            isLoading={isLoading}
+            errorMessage={errorMessage}
+          />
+        </ErrorBoundary>
+      </main>
+    </div>
+  );
+};
 
 export default App;
