@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router';
 import SearchSection from './Search/SearchSection';
 import ResultsSection from './Results/ResultsSection';
 import BuggyButton from './UI/BuggyButton';
 import ErrorBoundary from './UI/ErrorBoundary';
+import Pagination from './Pagination/Pagination';
 
 export interface Character {
   id: number;
@@ -12,71 +14,113 @@ export interface Character {
   image: string;
 }
 
-const App = () => {
+const HomePage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchValue, setSearchValue] = useState<string>(
-    () => localStorage.getItem('search_value') || ''
+    () => searchParams.get('q') || localStorage.getItem('search_value') || ''
   );
   const [lastExecutedTerm, setLastExecutedTerm] = useState<string>('');
   const [characters, setCharacters] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  // const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [lastExecutedPage, setLastExecutedPage] = useState<number>(1);
+
+  const currentPage = Number(searchParams.get('page')) || 1;
 
   const handleSearchChange = (value: string): void => {
     setSearchValue(value);
   };
 
-  const searchCharacters = async (): Promise<void> => {
-    const trimmedTerm = searchValue.trim();
+  const searchCharacters = useCallback(
+    async (page: number = 1): Promise<void> => {
+      const trimmedTerm = searchValue.trim();
 
-    if (trimmedTerm === lastExecutedTerm && lastExecutedTerm !== '') {
-      return;
-    }
-
-    setIsLoading(true);
-    setErrorMessage(null);
-    localStorage.setItem('search_value', trimmedTerm);
-
-    try {
-      const response = await fetch(
-        `https://rickandmortyapi.com/api/character/?name=${trimmedTerm}&page=1`
-      );
-
-      if (response.status === 404) {
-        setCharacters([]);
-        setLastExecutedTerm(trimmedTerm);
-
+      if (
+        trimmedTerm === lastExecutedTerm &&
+        page === lastExecutedPage &&
+        lastExecutedTerm !== ''
+      ) {
         return;
       }
 
-      if (!response.ok) {
-        throw new Error('Something went wrong with the server');
+      setIsLoading(true);
+      setErrorMessage(null);
+      localStorage.setItem('search_value', trimmedTerm);
+
+      try {
+        const response = await fetch(
+          `https://rickandmortyapi.com/api/character/?name=${trimmedTerm}&page=${page}`
+        );
+
+        if (response.status === 404) {
+          setCharacters([]);
+          setLastExecutedTerm(trimmedTerm);
+
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Something went wrong with the server');
+        }
+
+        const data = await response.json();
+        setCharacters(data.results || []);
+        setTotalPages(data.info?.pages || 1);
+        setLastExecutedTerm(trimmedTerm);
+        setLastExecutedPage(page);
+      } catch {
+        setCharacters([]);
+        setLastExecutedTerm(trimmedTerm);
+        setErrorMessage(
+          'Ouch! The interdimensional portal is unstable. (API Error)'
+        );
+      } finally {
+        setIsLoading(false);
       }
-
-      const data = await response.json();
-
-      setCharacters(data.results || []);
-      setLastExecutedTerm(trimmedTerm);
-    } catch {
-      setCharacters([]);
-      setLastExecutedTerm(trimmedTerm);
-      setErrorMessage(
-        'Ouch! The interdimensional portal is unstable. (API Error)'
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [searchValue, lastExecutedTerm, lastExecutedPage]
+  );
 
   const handleSearchClick = (): void => {
-    searchCharacters();
+    setSearchParams({
+      q: searchValue,
+      page: '1',
+    });
+  };
+
+  const handlePageChange = (newPage: number): void => {
+    setSearchParams({
+      q: searchValue,
+      page: String(newPage),
+    });
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    searchCharacters();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const fetchCharacters = async () => {
+      const page = Number(searchParams.get('page')) || 1;
+      const query = searchParams.get('q') || '';
+
+      setIsLoading(true);
+
+      try {
+        const response = await fetch(
+          `https://rickandmortyapi.com/api/character/?name=${query}&page=${page}`
+        );
+
+        const data = await response.json();
+
+        setCharacters(data.results || []);
+        setTotalPages(data.info?.pages || 1);
+      } catch {
+        setCharacters([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCharacters();
+  }, [searchParams]);
 
   return (
     <div className='min-h-screen bg-slate-950 text-slate-200 font-mono'>
@@ -93,7 +137,13 @@ const App = () => {
       <main className='max-w-5xl mx-auto px-6 py-8'>
         <ErrorBoundary>
           <BuggyButton />
-
+          {!isLoading && characters.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
           <ResultsSection
             characters={characters}
             isLoading={isLoading}
@@ -105,4 +155,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default HomePage;
