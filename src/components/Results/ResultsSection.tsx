@@ -1,4 +1,4 @@
-import type { Character } from '../../App';
+import type { Character } from '../../components/HomePage';
 import { CharacterCard } from './CharacterCard';
 import { Loader, ErrorState, EmptyState } from './ResultsStates';
 
