@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
-import App from './App';
-import { handlers } from './test-utils/handlers.ts';
+import HomePage from './HomePage.tsx';
+import { handlers } from '../test-utils/handlers.ts';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 
@@ -17,28 +17,28 @@ afterEach((): void => {
 });
 afterAll((): void => server.close());
 
-describe('App Search Persistence', (): void => {
+describe('HomePage Search Persistence', (): void => {
   test('displays previously saved search term from localStorage on mount', (): void => {
     const testSearchTerm = 'Rick';
     localStorage.setItem('search_value', testSearchTerm);
 
-    render(<App />);
+    render(<HomePage />);
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
     expect(searchInput).toHaveValue(testSearchTerm);
   });
 
   test('shows empty input when no saved term exists', (): void => {
-    render(<App />);
+    render(<HomePage />);
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
     expect(searchInput).toHaveValue('');
   });
 });
 
-describe('App User Interaction', (): void => {
+describe('HomePage User Interaction', (): void => {
   test('updates input value when user types', async (): Promise<void> => {
     const user = userEvent.setup();
 
-    render(<App />);
+    render(<HomePage />);
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
     const testValue = 'Rick';
     await user.type(searchInput, testValue);
@@ -51,7 +51,7 @@ describe('App User Interaction', (): void => {
 
     const spySetItem = vi.spyOn(Storage.prototype, 'setItem');
 
-    render(<App />);
+    render(<HomePage />);
 
     const button = screen.getByRole('button', { name: /search!/i });
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
@@ -66,7 +66,7 @@ describe('App User Interaction', (): void => {
   test('trims whitespace from search input before saving', async (): Promise<void> => {
     const user = userEvent.setup();
 
-    render(<App />);
+    render(<HomePage />);
 
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
     const button = screen.getByRole('button', { name: /search!/i });
@@ -78,12 +78,12 @@ describe('App User Interaction', (): void => {
   });
 });
 
-describe('App Local Storage Integration', (): void => {
+describe('HomePage Local Storage Integration', (): void => {
   test('retrieves saved search term on component mount', async (): Promise<void> => {
     const savedTerm = 'Rick';
     localStorage.setItem('search_value', savedTerm);
 
-    render(<App />);
+    render(<HomePage />);
 
     expect(await screen.findByText('Rick Sanchez')).toBeInTheDocument();
   });
@@ -91,7 +91,7 @@ describe('App Local Storage Integration', (): void => {
   test('does not execute duplicate search requests', async (): Promise<void> => {
     const user = userEvent.setup();
 
-    render(<App />);
+    render(<HomePage />);
 
     const input = screen.getByPlaceholderText(/Search character/i);
     const button = screen.getByRole('button', { name: /search!/i });
@@ -112,7 +112,7 @@ describe('App Local Storage Integration', (): void => {
   });
 });
 
-describe('App Error Handling', (): void => {
+describe('HomePage Error Handling', (): void => {
   test('handles 404 status by clearing characters list', async (): Promise<void> => {
     const user = userEvent.setup();
 
@@ -122,7 +122,7 @@ describe('App Error Handling', (): void => {
       })
     );
 
-    render(<App />);
+    render(<HomePage />);
 
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
     const button = screen.getByRole('button', { name: /search!/i });
@@ -145,7 +145,7 @@ describe('App Error Handling', (): void => {
       })
     );
 
-    render(<App />);
+    render(<HomePage />);
 
     const input = screen.getByPlaceholderText(/Search character.../i);
     const button = screen.getByRole('button', { name: /search!/i });
