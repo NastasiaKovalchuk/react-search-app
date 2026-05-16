@@ -16,17 +16,14 @@ const App = () => {
 
   return (
     <div className='min-h-screen bg-slate-950 text-slate-200 font-mono flex flex-col'>
-      {/* Главный объединенный Хедер */}
       <header className='w-full max-w-5xl mx-auto px-6 pt-6 select-none'>
         <div className='p-6 bg-slate-900 border-4 border-slate-800 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden'>
-          {/* Декоративные индикаторы терминала в углу панели */}
           <div className='absolute top-3 left-4 flex gap-1.5'>
             <div className='w-2 h-2 rounded-full bg-red-500/60'></div>
             <div className='w-2 h-2 rounded-full bg-yellow-500/60'></div>
             <div className='w-2 h-2 rounded-full bg-green-500/60'></div>
           </div>
 
-          {/* ИНТЕГРИРОВАННЫЙ ЛОГОТИП */}
           <Link
             to='/'
             className='flex flex-col items-center md:items-start group mt-1'
@@ -39,7 +36,6 @@ const App = () => {
             </p>
           </Link>
 
-          {/* НАВИГАЦИЯ */}
           <nav className='flex gap-3 w-full md:w-auto justify-center md:justify-end'>
             <Link to='/' className={getTabClass('/')}>
               Database
@@ -51,7 +47,6 @@ const App = () => {
         </div>
       </header>
 
-      {/* Основной контент */}
       <main className='max-w-5xl w-full mx-auto px-6 py-6 flex-1 flex flex-col'>
         <ErrorBoundary>
           <Outlet />
