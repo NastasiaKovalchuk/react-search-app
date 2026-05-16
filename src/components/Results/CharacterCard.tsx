@@ -1,4 +1,4 @@
-import type { Character } from '../../components/HomePage';
+import type { Character } from '../../pages/HomePage';
 
 export const CharacterCard = ({ char }: { char: Character }) => (
   <div className='bg-slate-950 border-2 border-lime-500/20 rounded-2xl overflow-hidden hover:border-lime-500/50 transition-all hover:translate-y-[-4px] group shadow-lg'>

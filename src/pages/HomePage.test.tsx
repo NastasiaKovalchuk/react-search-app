@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
-import HomePage from './HomePage.tsx';
+import HomePage from '../pages/HomePage.tsx';
 import { handlers } from '../test-utils/handlers.ts';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';

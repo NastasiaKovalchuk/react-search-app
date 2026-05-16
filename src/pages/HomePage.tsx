@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
-import SearchSection from './Search/SearchSection';
-import ResultsSection from './Results/ResultsSection';
-import BuggyButton from './UI/BuggyButton';
-import ErrorBoundary from './UI/ErrorBoundary';
-import Pagination from './Pagination/Pagination';
+import SearchSection from '../components/Search/SearchSection';
+import ResultsSection from '../components/Results/ResultsSection';
+import BuggyButton from '../components/UI/BuggyButton';
+import ErrorBoundary from '../components/UI/ErrorBoundary';
+import Pagination from '../components/Pagination/Pagination';
 
 export interface Character {
   id: number;
