@@ -10,7 +10,7 @@ const Pagination = ({
   onPageChange,
 }: PaginationProps) => {
   return (
-    <div className='flex items-center justify-center gap-3 mt-8 font-mono'>
+    <div className='flex items-center justify-center gap-3 mt-0 font-mono'>
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}

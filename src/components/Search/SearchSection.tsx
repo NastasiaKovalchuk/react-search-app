@@ -10,17 +10,8 @@ const SearchSection = ({
   onSearchClick,
 }: SearchSectionProps) => {
   return (
-    <div className='flex flex-col md:flex-row items-center justify-between gap-6'>
-      <div className='flex flex-col items-center md:items-start'>
-        <h1 className='text-3xl font-black tracking-tighter text-lime-400 uppercase italic'>
-          Rick & Morty <span className='text-white'>Finder</span>
-        </h1>
-        <p className='text-xs text-lime-600 font-bold uppercase tracking-widest'>
-          Dimension C-137 Database
-        </p>
-      </div>
-
-      <div className='flex w-full max-w-sm items-center gap-0'>
+    <div className='flex w-full justify-end select-none '>
+      <div className='flex w-full max-w-sm items-center gap-0  border-4 border-slate-800 p-2 rounded-2xl shadow-[0_0_20px_rgba(132,204,22,0.3)] '>
         <input
           type='text'
           placeholder='Search character...'
@@ -29,10 +20,11 @@ const SearchSection = ({
           onKeyDown={(e): void => {
             if (e.key === 'Enter') onSearchClick();
           }}
-          className='w-full px-4 py-3 bg-slate-800 border-2 border-lime-500 rounded-l-xl focus:bg-slate-700 outline-none text-lime-400 placeholder:text-lime-900 font-bold'
+          // Вернули w-full, чтобы инпут занимал все доступное пространство ВНУТРИ короткого контейнера
+          className='w-full px-4 py-3 bg-slate-950 border-2 border-slate-800 rounded-l-xl focus:border-lime-500/50 outline-none text-lime-400 placeholder:text-slate-700 font-bold transition-all text-sm'
         />
         <button
-          className='bg-lime-500 hover:bg-lime-400 text-slate-900 font-black px-6 py-3 rounded-r-xl transition-all hover:shadow-[0_0_15px_#bef264] uppercase text-sm border-2 border-lime-500'
+          className='bg-lime-500 hover:bg-lime-400 text-slate-900 font-black px-6 py-3 rounded-r-xl transition-all hover:shadow-[0_0_15px_#bef264] uppercase text-sm border-2 border-lime-500 h-full'
           onClick={onSearchClick}
         >
           Search!
