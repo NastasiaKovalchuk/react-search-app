@@ -4,7 +4,7 @@ import ErrorBoundary from './components/UI/ErrorBoundary';
 const App = () => {
   const location = useLocation();
 
-  const getTabClass = (path: string) => {
+  const getTabClass = (path: string): string => {
     const isActive = location.pathname === path;
     return `px-4 py-2 text-xs font-black uppercase tracking-wider transition-all duration-200 rounded-xl border-2
       ${

@@ -13,7 +13,7 @@ const ResultsSection = ({
   isLoading,
   errorMessage,
 }: ResultsProps) => {
-  const getStatusText = () => {
+  const getStatusText = (): string => {
     if (isLoading) return 'Status: Syncing...';
     if (errorMessage) return 'Status: Critical Error';
     return `Results: ${characters.length} units found`;

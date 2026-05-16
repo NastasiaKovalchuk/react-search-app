@@ -12,7 +12,7 @@ const Pagination = ({
   return (
     <div className='flex items-center justify-center gap-3 mt-0 font-mono'>
       <button
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={(): void => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className='px-5 py-2.5 bg-slate-950 border-2 border-lime-500 text-lime-400 font-black rounded-xl
                    text-sm uppercase tracking-wider transition-all duration-200
@@ -34,7 +34,7 @@ const Pagination = ({
       </div>
 
       <button
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={(): void => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className='px-5 py-2.5 bg-slate-950 border-2 border-lime-500 text-lime-400 font-black rounded-xl
                    text-sm uppercase tracking-wider transition-all duration-200

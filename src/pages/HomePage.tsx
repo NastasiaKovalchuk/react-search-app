@@ -5,6 +5,7 @@ import ResultsSection from '../components/Results/ResultsSection';
 import BuggyButton from '../components/UI/BuggyButton';
 import ErrorBoundary from '../components/UI/ErrorBoundary';
 import Pagination from '../components/Pagination/Pagination';
+import { useLocalStorage } from '../hook/useLocalStorage.ts';
 
 export interface Character {
   id: number;
@@ -16,8 +17,10 @@ export interface Character {
 
 const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [savedSearch, saveSearch] = useLocalStorage('search_value', '');
+
   const [searchValue, setSearchValue] = useState<string>(
-    () => searchParams.get('q') || localStorage.getItem('search_value') || ''
+    () => searchParams.get('q') || savedSearch
   );
   const [lastExecutedTerm, setLastExecutedTerm] = useState<string>('');
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -45,7 +48,6 @@ const HomePage = () => {
 
     setIsLoading(true);
     setErrorMessage(null);
-    localStorage.setItem('search_value', trimmedTerm);
 
     try {
       const response = await fetch(
@@ -80,8 +82,12 @@ const HomePage = () => {
   };
 
   const handleSearchClick = (): void => {
+    const trimmed = searchValue.trim();
+
+    saveSearch(trimmed);
+
     setSearchParams({
-      q: searchValue,
+      q: trimmed,
       page: '1',
     });
   };

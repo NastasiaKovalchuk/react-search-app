@@ -20,7 +20,6 @@ const SearchSection = ({
           onKeyDown={(e): void => {
             if (e.key === 'Enter') onSearchClick();
           }}
-          // Вернули w-full, чтобы инпут занимал все доступное пространство ВНУТРИ короткого контейнера
           className='w-full px-4 py-3 bg-slate-950 border-2 border-slate-800 rounded-l-xl focus:border-lime-500/50 outline-none text-lime-400 placeholder:text-slate-700 font-bold transition-all text-sm'
         />
         <button
