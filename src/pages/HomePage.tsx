@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router';
 import SearchSection from '../components/Search/SearchSection';
 import ResultsSection from '../components/Results/ResultsSection';
@@ -15,96 +15,127 @@ export interface Character {
   image: string;
 }
 
+export interface CharactersResponse {
+  results: Character[];
+  totalPages: number;
+}
+
+const fetchCharacters = async (
+  name: string,
+  page: number,
+  signal?: AbortSignal
+): Promise<CharactersResponse> => {
+  const response = await fetch(
+    `https://rickandmortyapi.com/api/character/?name=${name}&page=${page}`,
+    { signal }
+  );
+
+  if (response.status === 404) {
+    return {
+      results: [],
+      totalPages: 1,
+    };
+  }
+
+  if (response.status === 429) {
+    throw new Error('Too many requests');
+  }
+
+  if (!response.ok) {
+    throw new Error('API Error');
+  }
+
+  const data = await response.json();
+
+  return {
+    results: data.results || [],
+    totalPages: data.info?.pages || 1,
+  };
+};
+
 const HomePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [savedSearch, saveSearch] = useLocalStorage('search_value', '');
 
-  const [searchValue, setSearchValue] = useState<string>(
-    () => searchParams.get('q') || savedSearch
-  );
-  const [lastExecutedTerm, setLastExecutedTerm] = useState<string>('');
+  const queryParam = searchParams.get('q');
+  const pageParam = searchParams.get('page');
+
+  const currentPage = Number(pageParam) || 1;
+  const currentSearchTerm = queryParam !== null ? queryParam : savedSearch;
+
+  const [searchValue, setSearchValue] = useState<string>(currentSearchTerm);
+
   const [characters, setCharacters] = useState<Character[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [lastExecutedPage, setLastExecutedPage] = useState<number>(1);
 
-  const currentPage = Number(searchParams.get('page')) || 1;
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleSearchChange = (value: string): void => {
     setSearchValue(value);
   };
 
-  const searchCharacters = async (page: number = 1): Promise<void> => {
-    const trimmedTerm = searchValue.trim();
-
-    if (
-      trimmedTerm === lastExecutedTerm &&
-      page === lastExecutedPage &&
-      lastExecutedTerm !== ''
-    ) {
-      return;
-    }
-
-    setIsLoading(true);
-    setErrorMessage(null);
-
-    try {
-      const response = await fetch(
-        `https://rickandmortyapi.com/api/character/?name=${trimmedTerm}&page=${page}`
-      );
-
-      if (response.status === 404) {
-        setCharacters([]);
-        setLastExecutedTerm(trimmedTerm);
-
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error('Something went wrong with the server');
-      }
-
-      const data = await response.json();
-      setCharacters(data.results || []);
-      setTotalPages(data.info?.pages || 1);
-      setLastExecutedTerm(trimmedTerm);
-      setLastExecutedPage(page);
-    } catch {
-      setCharacters([]);
-      setLastExecutedTerm(trimmedTerm);
-      setErrorMessage(
-        'Ouch! The interdimensional portal is unstable. (API Error)'
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleSearchClick = (): void => {
-    const trimmed = searchValue.trim();
-
-    saveSearch(trimmed);
-
     setSearchParams({
-      q: trimmed,
+      q: searchValue.trim(),
       page: '1',
     });
   };
 
   const handlePageChange = (newPage: number): void => {
     setSearchParams({
-      q: searchValue,
+      q: currentSearchTerm,
       page: String(newPage),
     });
   };
 
-  useEffect(() => {
-    const page = Number(searchParams.get('page')) || 1;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    searchCharacters(page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  useEffect((): void => {
+    if (queryParam === null && savedSearch) {
+      setSearchParams({
+        q: savedSearch,
+        page: '1',
+      });
+    }
+  }, [queryParam, savedSearch, setSearchParams]);
+
+  useEffect((): (() => void) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    const loadCharacters = async () => {
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      try {
+        const data = await fetchCharacters(
+          currentSearchTerm,
+          currentPage,
+          controller.signal
+        );
+
+        setCharacters(data.results);
+        setTotalPages(data.totalPages);
+
+        saveSearch(currentSearchTerm);
+      } catch (error) {
+        if (error.name === 'AbortError') return;
+        setCharacters([]);
+        setErrorMessage('Ouch! The interdimensional portal is unstable.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCharacters();
+
+    return (): void => {
+      controller.abort();
+    };
+  }, [currentSearchTerm, currentPage, saveSearch]);
 
   return (
     <div className='min-h-screen bg-slate-950 text-slate-200 font-mono'>
