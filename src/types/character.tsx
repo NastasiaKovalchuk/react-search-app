@@ -5,3 +5,8 @@ export interface Character {
   status: string;
   image: string;
 }
+
+export interface CharactersResponse {
+  results: Character[];
+  totalPages: number;
+}

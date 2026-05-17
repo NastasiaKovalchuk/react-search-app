@@ -16,7 +16,7 @@ const App = () => {
 
   return (
     <div className='min-h-screen bg-slate-950 text-slate-200 font-mono flex flex-col'>
-      <header className='w-full max-w-5xl mx-auto px-6 pt-6 select-none'>
+      <header className='w-full max-w-6xl mx-auto px-6 pt-6 select-none'>
         <div className='p-6 bg-slate-900 border-4 border-slate-800 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden'>
           <div className='absolute top-3 left-4 flex gap-1.5'>
             <div className='w-2 h-2 rounded-full bg-red-500/60'></div>
@@ -47,7 +47,7 @@ const App = () => {
         </div>
       </header>
 
-      <main className='max-w-5xl w-full mx-auto px-6 py-6 flex-1 flex flex-col'>
+      <main className='max-w-6xl w-full mx-auto px-6 py-6 flex-1 flex flex-col'>
         <ErrorBoundary>
           <Outlet />
         </ErrorBoundary>

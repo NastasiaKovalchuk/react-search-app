@@ -3,7 +3,7 @@ import { useState } from 'react';
 const BuggyButton = () => {
   const [shouldThrow, setShouldThrow] = useState<boolean>(false);
 
-  const handleThrow = () => {
+  const handleThrow = (): void => {
     setShouldThrow(true);
   };
 

@@ -1,4 +1,4 @@
-import { type Character } from '../App.tsx';
+import { type Character } from '../types/character';
 
 export const mockCharacters: Character[] = [
   {

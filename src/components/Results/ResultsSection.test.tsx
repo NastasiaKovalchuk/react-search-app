@@ -6,6 +6,7 @@ describe('Results Section Component', (): void => {
   const defaultProps = {
     isLoading: false,
     errorMessage: null,
+    onCharacterClick: (id: number) => void;
   };
 
   test('renders correct number of items when data is provided', (): void => {

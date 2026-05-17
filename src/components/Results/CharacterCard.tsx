@@ -1,7 +1,15 @@
-import type { Character } from '../../pages/HomePage';
+import { type Character } from '../../types/character';
 
-export const CharacterCard = ({ char }: { char: Character }) => (
-  <div className='bg-slate-950 border-2 border-lime-500/20 rounded-2xl overflow-hidden hover:border-lime-500/50 transition-all hover:translate-y-[-4px] group shadow-lg'>
+interface CharacterCardProps {
+  char: Character;
+  onClick: () => void;
+}
+
+export const CharacterCard = ({ char, onClick }: CharacterCardProps) => (
+  <div
+    onClick={onClick}
+    className='bg-slate-950 border-2 border-lime-500/20 rounded-2xl overflow-hidden hover:border-lime-500/50 transition-all hover:translate-y-[-4px] group shadow-lg'
+  >
     <img
       src={char.image}
       alt={char.name}
@@ -14,9 +22,6 @@ export const CharacterCard = ({ char }: { char: Character }) => (
       <div className='mt-2 space-y-1'>
         <p className='text-[11px] text-slate-500 uppercase font-bold tracking-widest'>
           Species: <span className='text-slate-200'>{char.species}</span>
-        </p>
-        <p className='text-[11px] text-slate-500 uppercase font-bold tracking-widest'>
-          Status: <span className='text-slate-200'>{char.status}</span>
         </p>
       </div>
     </div>

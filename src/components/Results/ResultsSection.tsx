@@ -1,4 +1,4 @@
-import type { Character } from '../../pages/HomePage';
+import { type Character } from '../../types/character';
 import { CharacterCard } from './CharacterCard';
 import { Loader, ErrorState, EmptyState } from './ResultsStates';
 
@@ -6,12 +6,14 @@ interface ResultsProps {
   characters: Character[];
   isLoading: boolean;
   errorMessage: string | null;
+  onCharacterClick: (id: number) => void;
 }
 
 const ResultsSection = ({
   characters,
   isLoading,
   errorMessage,
+  onCharacterClick,
 }: ResultsProps) => {
   const getStatusText = (): string => {
     if (isLoading) return 'Status: Syncing...';
@@ -25,9 +27,13 @@ const ResultsSection = ({
     if (characters.length === 0) return <EmptyState />;
 
     return (
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
         {characters.map((char) => (
-          <CharacterCard key={char.id} char={char} />
+          <CharacterCard
+            key={char.id}
+            char={char}
+            onClick={(): void => onCharacterClick(char.id)}
+          />
         ))}
       </div>
     );
