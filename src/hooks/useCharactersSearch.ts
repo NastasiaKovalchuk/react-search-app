@@ -29,14 +29,14 @@ export const useCharactersSearch = () => {
     }
   }, [queryParam, savedSearch, setSearchParams]);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    const loadCharacters = async () => {
+    const loadCharacters = async (): Promise<void> => {
       setIsLoading(true);
       setErrorMessage(null);
 

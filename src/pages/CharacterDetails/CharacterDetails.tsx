@@ -45,14 +45,6 @@ export const CharacterDetails = () => {
     getDetails();
   }, [id]);
 
-  useEffect((): (() => void) => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return (): void => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
-
   return (
     <div className='h-fit flex flex-col font-mono select-none text-slate-200'>
       <div className='pb-1 flex items-center justify-between border-b border-slate-800/80'>

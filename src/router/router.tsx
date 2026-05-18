@@ -1,9 +1,9 @@
 import { createBrowserRouter } from 'react-router';
 import App from '../App';
-import HomePage from '../pages/HomePage';
-import AboutPage from '../pages/AboutPage';
-import NotFoundPage from '../pages/NotFoundPage';
-import { CharacterDetails } from '../pages/CharacterDetails';
+import HomePage from '../pages/HomePage/HomePage';
+import AboutPage from '../pages/About/AboutPage';
+import NotFoundPage from '../pages/NotFoundPage/NotFoundPage';
+import { CharacterDetails } from '../pages/CharacterDetails/CharacterDetails';
 
 export const router = createBrowserRouter([
   {

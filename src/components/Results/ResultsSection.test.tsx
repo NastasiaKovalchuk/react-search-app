@@ -1,13 +1,20 @@
 import { render, screen } from '@testing-library/react';
+import { vi } from 'vitest';
 import ResultsSection from './ResultsSection';
 import { mockCharacters } from '../../test-utils/characters.mock.ts';
 
 describe('Results Section Component', (): void => {
+  const mockOnCharacterClick = vi.fn();
   const defaultProps = {
+    characters: [],
     isLoading: false,
     errorMessage: null,
-    onCharacterClick: (id: number) => void;
+    onCharacterClick: mockOnCharacterClick,
   };
+
+  beforeEach((): void => {
+    vi.clearAllMocks();
+  });
 
   test('renders correct number of items when data is provided', (): void => {
     render(<ResultsSection {...defaultProps} characters={mockCharacters} />);
@@ -25,9 +32,7 @@ describe('Results Section Component', (): void => {
   });
 
   test('shows loading state while fetching data', (): void => {
-    render(
-      <ResultsSection characters={[]} isLoading={true} errorMessage={null} />
-    );
+    render(<ResultsSection {...defaultProps} isLoading={true} />);
 
     expect(
       screen.getByText(/Accessing Central Finite Curve/i)

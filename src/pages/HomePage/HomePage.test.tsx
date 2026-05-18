@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
-import HomePage from '../pages/HomePage.tsx';
-import { handlers } from '../test-utils/handlers.ts';
+import { MemoryRouter, Routes, Route, useOutletContext } from 'react-router';
+import HomePage from './HomePage.tsx';
+import { handlers } from '../../test-utils/handlers.ts';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 
@@ -17,18 +18,33 @@ afterEach((): void => {
 });
 afterAll((): void => server.close());
 
+const renderWithRouter = (initialEntries = ['/']) => {
+  return render(
+    <MemoryRouter initialEntries={initialEntries}>
+      <Routes>
+        <Route path='/' element={<HomePage />}>
+          <Route path='details/:id' element={<div>Details Outlet</div>} />
+        </Route>
+      </Routes>
+    </MemoryRouter>
+  );
+};
+
 describe('HomePage Search Persistence', (): void => {
   test('displays previously saved search term from localStorage on mount', (): void => {
     const testSearchTerm = 'Rick';
     localStorage.setItem('search_value', testSearchTerm);
 
-    render(<HomePage />);
+    renderWithRouter();
+
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
     expect(searchInput).toHaveValue(testSearchTerm);
   });
 
   test('shows empty input when no saved term exists', (): void => {
-    render(<HomePage />);
+    localStorage.clear();
+    renderWithRouter();
+
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
     expect(searchInput).toHaveValue('');
   });
@@ -38,7 +54,8 @@ describe('HomePage User Interaction', (): void => {
   test('updates input value when user types', async (): Promise<void> => {
     const user = userEvent.setup();
 
-    render(<HomePage />);
+    renderWithRouter();
+
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
     const testValue = 'Rick';
     await user.type(searchInput, testValue);
@@ -51,7 +68,7 @@ describe('HomePage User Interaction', (): void => {
 
     const spySetItem = vi.spyOn(Storage.prototype, 'setItem');
 
-    render(<HomePage />);
+    renderWithRouter();
 
     const button = screen.getByRole('button', { name: /search!/i });
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
@@ -66,7 +83,7 @@ describe('HomePage User Interaction', (): void => {
   test('trims whitespace from search input before saving', async (): Promise<void> => {
     const user = userEvent.setup();
 
-    render(<HomePage />);
+    renderWithRouter();
 
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
     const button = screen.getByRole('button', { name: /search!/i });
@@ -83,7 +100,7 @@ describe('HomePage Local Storage Integration', (): void => {
     const savedTerm = 'Rick';
     localStorage.setItem('search_value', savedTerm);
 
-    render(<HomePage />);
+    renderWithRouter();
 
     expect(await screen.findByText('Rick Sanchez')).toBeInTheDocument();
   });
@@ -91,7 +108,7 @@ describe('HomePage Local Storage Integration', (): void => {
   test('does not execute duplicate search requests', async (): Promise<void> => {
     const user = userEvent.setup();
 
-    render(<HomePage />);
+    renderWithRouter();
 
     const input = screen.getByPlaceholderText(/Search character/i);
     const button = screen.getByRole('button', { name: /search!/i });
@@ -122,7 +139,7 @@ describe('HomePage Error Handling', (): void => {
       })
     );
 
-    render(<HomePage />);
+    renderWithRouter();
 
     const searchInput = screen.getByPlaceholderText(/Search character.../i);
     const button = screen.getByRole('button', { name: /search!/i });
@@ -134,6 +151,8 @@ describe('HomePage Error Handling', (): void => {
       /Ouch! The interdimensional portal is unstable/i
     );
     expect(apiError).not.toBeInTheDocument();
+    expect(await screen.findByText(/No Life Forms Found/i)).toBeInTheDocument();
+    expect(screen.getByText(/Results: 0 units found/i)).toBeInTheDocument();
   });
 
   test('displays error message and renders ErrorState when fetch fails', async (): Promise<void> => {
@@ -145,7 +164,7 @@ describe('HomePage Error Handling', (): void => {
       })
     );
 
-    render(<HomePage />);
+    renderWithRouter();
 
     const input = screen.getByPlaceholderText(/Search character.../i);
     const button = screen.getByRole('button', { name: /search!/i });
@@ -158,5 +177,58 @@ describe('HomePage Error Handling', (): void => {
     ).toBeInTheDocument();
 
     expect(screen.getByText(/Dimension Error Detected/i)).toBeInTheDocument();
+  });
+});
+
+describe('HomePage Navigation and Side Panel Dynamics', (): void => {
+  test('navigates to details view route and expands panel on character card click (Line 28)', async (): Promise<void> => {
+    const user = userEvent.setup();
+
+    renderWithRouter();
+
+    const searchInput = screen.getByPlaceholderText(/Search character.../i);
+    const button = screen.getByRole('button', { name: /search!/i });
+
+    await user.type(searchInput, 'Rick');
+    await user.click(button);
+
+    const characterCard = await screen.findByText(
+      'Rick Sanchez',
+      {},
+      { timeout: 3000 }
+    );
+    expect(characterCard).toBeInTheDocument();
+
+    await user.click(characterCard);
+
+    expect(screen.getByText('Details Outlet')).toBeInTheDocument();
+  });
+
+  test('collapses details view and returns to base route path on closure action (Line 35)', async (): Promise<void> => {
+    const user = userEvent.setup();
+
+    const MockDetailInterior = () => {
+      const { onClose } = useOutletContext() as { onClose: () => void };
+      return <button onClick={onClose}>Close Portal View</button>;
+    };
+
+    render(
+      <MemoryRouter initialEntries={['/details/1']}>
+        <Routes>
+          <Route path='/' element={<HomePage />}>
+            <Route path='details/:id' element={<MockDetailInterior />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+
+    const closeBtn = await screen.findByRole('button', {
+      name: /Close Portal View/i,
+    });
+    expect(closeBtn).toBeInTheDocument();
+
+    await user.click(closeBtn);
+
+    expect(screen.queryByText('Close Portal View')).not.toBeInTheDocument();
   });
 });
